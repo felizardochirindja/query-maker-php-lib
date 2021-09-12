@@ -1,0 +1,24 @@
+{
+    "name": "autolife/query-maker",
+    "description": "gerador de consultas de banco de dados",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "QueryMaker\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Felizardo Chirindja",
+            "email": "felizardo.chirindja@gmail.com",
+            "role": "developer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
+}
