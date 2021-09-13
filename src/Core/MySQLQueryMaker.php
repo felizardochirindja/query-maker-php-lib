@@ -129,9 +129,7 @@ final class MySQLQueryMaker implements QueryMaker
             return $statment->fetch(PDO::FETCH_ASSOC);
         }
 
-        if ($statment->rowCount() === 0) {
-            return [];
-        }
+        return [];
     }
 
     public function delete(int $id) : bool
