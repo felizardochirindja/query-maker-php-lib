@@ -132,6 +132,11 @@ final class MySQLQueryMaker implements QueryMaker
         return [];
     }
 
+    public function update(int $id, array $data) : bool
+    {
+        return true;
+    }
+
     public function delete(int $id) : bool
     {
         $query = 'DELETE FROM ' . $this->model->tableName . ' WHERE id = :id;';
