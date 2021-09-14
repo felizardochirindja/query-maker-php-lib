@@ -132,7 +132,7 @@ final class MySQLQueryMaker implements QueryMaker
         return [];
     }
 
-    public function update(int $id, array $data) : bool
+    public function update(int $id, mixed ...$data) : bool
     {
         return true;
     }

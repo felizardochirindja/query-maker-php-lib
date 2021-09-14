@@ -7,6 +7,6 @@ interface QueryMaker
     function insert(mixed $useId, mixed ...$data) : bool;
     function select(int $firstRecordPosition, int $recordsPerPage) : array;
     function selectOne(int $id) : array;
-    function update(int $id, array $data) : bool;
+    function update(int $id, mixed ...$data) : bool;
     function delete(int $id) : bool;
 }
