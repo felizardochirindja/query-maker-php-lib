@@ -92,4 +92,37 @@ class MySQLQueryMakerTest extends TestCase
         // assert
         $this->assertTrue($isDelected);
     }
+
+    public function testAutomateBindParam()
+    {
+        // arange
+        $dataBaseConnector = new MySQLConnector('localhost', 'test', 'root', '');
+
+        $model = $this->getMockBuilder(MainModel::class)
+            ->setConstructorArgs(['users'])
+            ->getMock();
+            
+        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
+        $automateBindParamMethod = self::getMethod($queryMaker, 'automateBindParam');
+            
+        $query = 'SELECT INTO users (name, password) VALUES ("Armando", "123547");';
+        // $automateBindParamMethod->invokeArgs($queryMaker, );
+
+        // act
+
+        // assert
+        $this->markTestIncomplete();
+    }
+    
+    protected static function getMethod(
+        object $className,
+        string $methodName
+    ) : ReflectionMethod
+    {
+        $class = new ReflectionClass($className::class);
+        $method = $class->getMethod($methodName);
+        $method->setAccessible(true);
+
+        return $method;
+    }
 }
