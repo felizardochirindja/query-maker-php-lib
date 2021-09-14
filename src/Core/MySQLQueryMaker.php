@@ -26,7 +26,7 @@ final class MySQLQueryMaker implements QueryMaker
     {
         if (!is_bool($useId)) {
             throw new InvalidArgumentException(
-                "userId argument missing: you must pass true or false"
+                "userId argument invalid: you must pass true or false"
             );
         }
         
