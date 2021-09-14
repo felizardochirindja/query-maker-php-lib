@@ -22,7 +22,7 @@ class MySQLQueryMakerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         // act
-        $queryMaker->insert(true, 'felizardo', 15268);
+        $queryMaker->insert('felizardo', 30);
     }
 
     public function testSelectOne()
