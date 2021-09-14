@@ -36,11 +36,23 @@ class MySQLQueryMakerTest extends TestCase
         $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
 
         // act
-        $row = $queryMaker->selectOne(30);
+        $row = $queryMaker->selectOne(10);
 
         // // assert
-        $this->assertIsArray($row);
-        $this->assertSame([], $row);
+        if (count($row) > 0) {
+            foreach ($row as $key => $value) {
+                $keys[] = $key;
+            }
+            
+            $this->assertIsArray($row);
+            $this->assertSame('id', $keys[0]);
+            $this->assertSame('name', $keys[1]);
+            $this->assertSame('password', $keys[2]);
+        }
+
+        if (count($row) === 0) {
+            $this->assertSame([], $row);
+        }
     }
 
     public function testSelect()
