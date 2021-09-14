@@ -30,20 +30,20 @@ final class MySQLQueryMaker implements QueryMaker
             );
         }
         
-        $columns = $this->getColumnNames($useId);
+        $columns = $this->getColumns($useId);
 
         $query = 'INSERT INTO ' . $this->model->tableName . ' (' .
-            $this->appendColumnNames($columns) .
+            $this->appendColumns($columns) .
             ') VALUES (' . $this->appendBindParams($columns) . ');';
 
         $statment = $this->dataBaseConnection->prepare($query);
 
-        $this->automateBindParam($statment, $columns, $data)->execute();
+        $this->autoBindParam($statment, $columns, $data)->execute();
 
         return true;
     }
 
-    private function getColumnNames(bool $useId) : array
+    private function getColumns(bool $useId) : array
     {
         $query = 'SHOW COLUMNS FROM ' . $this->model->tableName;
 
@@ -63,7 +63,7 @@ final class MySQLQueryMaker implements QueryMaker
         return $columns;
     }
 
-    private function appendColumnNames(array $columnNames) : string
+    private function appendColumns(array $columnNames) : string
     {
         $columns = '';
 
@@ -89,7 +89,7 @@ final class MySQLQueryMaker implements QueryMaker
         return $columns;
     }
     
-    private function automateBindParam(
+    private function autoBindParam(
         PDOStatement $statment,
         array $columns,
         array $data    
