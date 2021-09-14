@@ -32,9 +32,9 @@ final class MySQLQueryMaker implements QueryMaker
         
         $columns = $this->getColumnNames($useId);
 
-        $query = 'INSERT INTO ' . $this->model->tableName . ' ' .
+        $query = 'INSERT INTO ' . $this->model->tableName . ' (' .
             $this->appendColumnNames($columns) .
-            ' VALUES ' . $this->appendBindParams($columns) . ';';
+            ') VALUES (' . $this->appendBindParams($columns) . ');';
 
         $statment = $this->dataBaseConnection->prepare($query);
 
@@ -65,26 +65,26 @@ final class MySQLQueryMaker implements QueryMaker
 
     private function appendColumnNames(array $columnNames) : string
     {
-        $columns = '(';
+        $columns = '';
 
         for ($i = 0; $i < count($columnNames) - 1; $i++) { 
             $columns .= $columnNames[$i] . ', ';
         }
 
-        $columns .= $columnNames[count($columnNames) - 1] . ')';
+        $columns .= $columnNames[count($columnNames) - 1];
 
         return $columns;
     }
 
     private function appendBindParams(array $columnNames) : string
     {
-        $columns = '(';
+        $columns = '';
 
         for ($i = 0; $i < count($columnNames) - 1; $i++) { 
             $columns .= ':' . $columnNames[$i] . ', ';
         }
 
-        $columns .= ':' . $columnNames[count($columnNames) - 1] . ')';
+        $columns .= ':' . $columnNames[count($columnNames) - 1];
 
         return $columns;
     }
