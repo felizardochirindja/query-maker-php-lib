@@ -60,6 +60,20 @@ class MySQLQueryMakerTest extends TestCase
         $this->assertIsArray($row);
     }
 
+    public function testUpdate()
+    {
+        $model = $this->getMockBuilder(MainModel::class)
+            ->setConstructorArgs(['users'])
+            ->getMock();
+
+        $dataBaseConnector = new MySQLConnector('localhost', 'test', 'root', '');
+        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
+
+        $updated = $queryMaker->update(1, 'Felizardo', 125448);
+
+        $this->assertTrue($updated);
+    }
+
     public function testDelete()
     {
         $this->markTestSkipped('metodo pulado para que nao sejam eliminados dados no banco');
