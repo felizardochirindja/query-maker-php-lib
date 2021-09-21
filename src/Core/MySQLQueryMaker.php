@@ -50,8 +50,6 @@ final class MySQLQueryMaker implements QueryMaker
         $statment = $this->dataBaseConnection->prepare($query);
         $statment->execute();
 
-        $columns = [];
-
         foreach ($statment->fetchAll(PDO::FETCH_ASSOC) as $value) {
             $columns[] = $value['Field'];
         }
