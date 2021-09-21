@@ -21,10 +21,13 @@ class MySQLQueryMakerTest extends TestCase
         $dataBaseConnector = new MySQLConnector('localhost', 'test', 'root', '');
         $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
         
-        $this->expectException(InvalidArgumentException::class);
+        // $this->expectException(InvalidArgumentException::class);
 
         // act
-        $queryMaker->insert(false, 'felizardo', 30);
+        $result = $queryMaker->insert(false, 'felizardo', 30);
+
+        // assert
+        $this->assertTrue($result);
     }
 
     public function testSelectOne()
@@ -107,8 +110,41 @@ class MySQLQueryMakerTest extends TestCase
         $this->assertTrue($isDelected);
     }
 
-    public function testAutomateBindParam()
+    public function testAutoBindParam()
     {
+        // arange
+        $dbConnector = new MySQLConnector('localhost', 'test', 'root', '');
+        $dbConnection = $dbConnector->getConnection();
+
+        $model = $this->getMockBuilder(MainModel::class)
+            ->setConstructorArgs(['users'])
+            ->getMock();
+            
+        $queryMaker = new MySQLQueryMaker($model, $dbConnector);
+        $autoBindParamMethod = self::getMethod($queryMaker, 'autoBindParam');
+            
+        // act
+        $query = 'SELECT * FROM users WHERE id = :id';
+        $statment = $dbConnection->prepare($query);
+
+        $result = $autoBindParamMethod->invokeArgs(
+            $queryMaker, 
+            [
+                $statment,
+                ['id'], [1]
+            ]
+        );
+
+        $result->execute();
+        $result = $result->fetch(PDO::FETCH_ASSOC);
+
+        // assert
+        $this->assertIsArray($result);
+        $this->assertEquals(
+            ['id' => '1', 'name' => 'felizardo', 'password' => '30'],
+            $result
+        );
+
     }
     
     protected static function getMethod(
