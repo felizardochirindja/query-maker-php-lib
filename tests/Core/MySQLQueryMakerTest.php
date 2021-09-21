@@ -11,6 +11,8 @@ class MySQLQueryMakerTest extends TestCase
 {
     public function testInsert()
     {
+        $this->markTestSkipped('evitando insercao de dados no banco de dados');
+
         // arange
         $model = $this->getMockBuilder(MainModel::class)
             ->setConstructorArgs(['users'])
@@ -22,7 +24,7 @@ class MySQLQueryMakerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         // act
-        $queryMaker->insert('felizardo', 30);
+        $queryMaker->insert(false, 'felizardo', 30);
     }
 
     public function testSelectOne()
@@ -107,23 +109,6 @@ class MySQLQueryMakerTest extends TestCase
 
     public function testAutomateBindParam()
     {
-        // arange
-        $dataBaseConnector = new MySQLConnector('localhost', 'test', 'root', '');
-
-        $model = $this->getMockBuilder(MainModel::class)
-            ->setConstructorArgs(['users'])
-            ->getMock();
-            
-        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
-        $automateBindParamMethod = self::getMethod($queryMaker, 'automateBindParam');
-            
-        $query = 'SELECT INTO users (name, password) VALUES ("Armando", "123547");';
-        // $automateBindParamMethod->invokeArgs($queryMaker, );
-
-        // act
-
-        // assert
-        $this->markTestIncomplete();
     }
     
     protected static function getMethod(
