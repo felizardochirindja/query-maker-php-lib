@@ -1,2 +1,2 @@
 # query-maker
- gerador de consultas MySQL
+ Mini ORM para consultas MySQL inspirado no padrão Active Record
