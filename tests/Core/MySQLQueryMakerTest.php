@@ -1,7 +1,6 @@
 <?php
 
 require '../../vendor/autoload.php';
-require '../DataBase/MySQLConnector.php';
 
 use PHPUnit\Framework\TestCase;
 use QueryMaker\Core\MySQLQueryMaker;
@@ -11,15 +10,19 @@ class MySQLQueryMakerTest extends TestCase
 {
     public function testInsert()
     {
-        $this->markTestSkipped('evitando insercao de dados no banco de dados');
+        // $this->markTestSkipped('evitando insercao de dados no banco de dados');
 
         // arange
+
+        /**
+         * @var MainModel
+        */
         $model = $this->getMockBuilder(MainModel::class)
             ->setConstructorArgs(['users'])
             ->getMock();
 
-        $dataBaseConnector = new MySQLConnector('localhost', 'test', 'root', '');
-        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
+        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
         
         // $this->expectException(InvalidArgumentException::class);
 
@@ -33,12 +36,16 @@ class MySQLQueryMakerTest extends TestCase
     public function testSelectOne()
     {
         // arange
+
+        /**
+         * @var MainModel
+        */
         $model = $this->getMockBuilder(MainModel::class)
             ->setConstructorArgs(['users'])
             ->getMock();
         
-        $dataBaseConnector = new MySQLConnector('localhost', 'test', 'root', '');
-        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
+        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
 
         // act
         $row = $queryMaker->selectOne(10);
@@ -63,12 +70,16 @@ class MySQLQueryMakerTest extends TestCase
     public function testSelect()
     {
         // arange
+
+        /**
+         * @var MainModel
+        */
         $model = $this->getMockBuilder(MainModel::class)
             ->setConstructorArgs(['users'])
             ->getMock();
         
-        $dataBaseConnector = new MySQLConnector('localhost', 'test', 'root', '');
-        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
+        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
 
         // act
         $row = $queryMaker->select(1, 5);
@@ -79,12 +90,17 @@ class MySQLQueryMakerTest extends TestCase
 
     public function testUpdate()
     {
+        // arrange
+
+        /**
+         * @var MainModel
+        */
         $model = $this->getMockBuilder(MainModel::class)
             ->setConstructorArgs(['users'])
             ->getMock();
 
-        $dataBaseConnector = new MySQLConnector('localhost', 'test', 'root', '');
-        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
+        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
 
         $updated = $queryMaker->update(1, 'Felizardo', 125448);
 
@@ -96,12 +112,16 @@ class MySQLQueryMakerTest extends TestCase
         $this->markTestSkipped('metodo pulado para que nao sejam eliminados dados no banco');
 
         // arange
+
+        /**
+         * @var MainModel
+        */
         $model = $this->getMockBuilder(MainModel::class)
             ->setConstructorArgs(['users'])
             ->getMock();
         
-        $dataBaseConnector = new MySQLConnector('localhost', 'test', 'root', '');
-        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnector);
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
+        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
 
         // act
         $isDelected = $queryMaker->delete(2);
@@ -113,13 +133,17 @@ class MySQLQueryMakerTest extends TestCase
     public function testAutoBindParam()
     {
         // arange
+        $this->markTestSkipped();
         $dbConnector = new MySQLConnector('localhost', 'test', 'root', '');
         $dbConnection = $dbConnector->getConnection();
 
+        /**
+         * @var MainModel
+        */
         $model = $this->getMockBuilder(MainModel::class)
             ->setConstructorArgs(['users'])
             ->getMock();
-            
+        
         $queryMaker = new MySQLQueryMaker($model, $dbConnector);
         $autoBindParamMethod = self::getMethod($queryMaker, 'autoBindParam');
             
