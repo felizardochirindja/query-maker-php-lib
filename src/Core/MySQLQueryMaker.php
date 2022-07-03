@@ -7,20 +7,15 @@ use function count;
 use InvalidArgumentException;
 use PDO;
 use PDOStatement;
-use QueryMaker\Contracts\DataBaseConnector;
 use QueryMaker\Contracts\QueryMaker;
 use QueryMaker\Model\MainModel;
 
 final class MySQLQueryMaker implements QueryMaker
 {
-    private PDO $dataBaseConnection;
-
     public function __construct(
         private MainModel $model,
-        DataBaseConnector $dataBaseConnector
-    ) {
-        $this->dataBaseConnection = $dataBaseConnector->getConnection();
-    }
+        private PDO $dataBaseConnection
+    ) { }
 
     public function insert(mixed $useId, mixed ...$data) : bool
     {
