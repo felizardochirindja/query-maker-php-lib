@@ -10,7 +10,7 @@ class MySQLQueryMakerTest extends TestCase
 {
     public function testInsert()
     {
-        // $this->markTestSkipped('evitando insercao de dados no banco de dados');
+        $this->markTestSkipped('this test can arbitrarly broke the consistance of the data base');
 
         // arange
 
@@ -21,7 +21,7 @@ class MySQLQueryMakerTest extends TestCase
             ->setConstructorArgs(['users'])
             ->getMock();
 
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_acl', 'root', '');
         $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
         
         // $this->expectException(InvalidArgumentException::class);
@@ -44,22 +44,18 @@ class MySQLQueryMakerTest extends TestCase
             ->setConstructorArgs(['users'])
             ->getMock();
         
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_acl', 'root', '');
         $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
 
         // act
-        $row = $queryMaker->selectOne(10);
+        $row = $queryMaker->selectOne(1);
 
         // // assert
-        if (count($row) > 0) {
-            foreach ($row as $key => $value) {
-                $keys[] = $key;
-            }
-            
+        if (count($row) > 0) {            
             $this->assertIsArray($row);
-            $this->assertSame('id', $keys[0]);
-            $this->assertSame('name', $keys[1]);
-            $this->assertSame('password', $keys[2]);
+            $this->assertArrayHasKey('id', $row);
+            $this->assertArrayHasKey('username', $row);
+            $this->assertArrayHasKey('user_password', $row);
         }
 
         if (count($row) === 0) {
@@ -78,7 +74,7 @@ class MySQLQueryMakerTest extends TestCase
             ->setConstructorArgs(['users'])
             ->getMock();
         
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_acl', 'root', '');
         $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
 
         // act
@@ -90,6 +86,8 @@ class MySQLQueryMakerTest extends TestCase
 
     public function testUpdate()
     {
+        $this->markTestSkipped('this test can arbitrarly broke the consistance of the data base');
+
         // arrange
 
         /**
@@ -99,7 +97,7 @@ class MySQLQueryMakerTest extends TestCase
             ->setConstructorArgs(['users'])
             ->getMock();
 
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_acl', 'root', '');
         $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
 
         $updated = $queryMaker->update(1, 'Felizardo', 125448);
@@ -109,7 +107,7 @@ class MySQLQueryMakerTest extends TestCase
 
     public function testDelete()
     {
-        $this->markTestSkipped('metodo pulado para que nao sejam eliminados dados no banco');
+        $this->markTestSkipped('this test can arbitrarly broke the consistance of the data base');
 
         // arange
 
@@ -134,7 +132,7 @@ class MySQLQueryMakerTest extends TestCase
     {
         // arange
         $this->markTestSkipped();
-        $dbConnector = new MySQLConnector('localhost', 'test', 'root', '');
+        $dbConnector = new MySQLConnector('localhost', 'test_acl', 'root', '');
         $dbConnection = $dbConnector->getConnection();
 
         /**
