@@ -132,8 +132,7 @@ class MySQLQueryMakerTest extends TestCase
     {
         // arange
         $this->markTestSkipped();
-        $dbConnector = new MySQLConnector('localhost', 'test_acl', 'root', '');
-        $dbConnection = $dbConnector->getConnection();
+        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
 
         /**
          * @var MainModel
@@ -142,12 +141,12 @@ class MySQLQueryMakerTest extends TestCase
             ->setConstructorArgs(['users'])
             ->getMock();
         
-        $queryMaker = new MySQLQueryMaker($model, $dbConnector);
+        $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
         $autoBindParamMethod = self::getMethod($queryMaker, 'autoBindParam');
             
         // act
         $query = 'SELECT * FROM users WHERE id = :id';
-        $statment = $dbConnection->prepare($query);
+        $statment = $dataBaseConnection->prepare($query);
 
         $result = $autoBindParamMethod->invokeArgs(
             $queryMaker, 
@@ -158,14 +157,8 @@ class MySQLQueryMakerTest extends TestCase
         );
 
         $result->execute();
-        $result = $result->fetch(PDO::FETCH_ASSOC);
-
-        // assert
-        $this->assertIsArray($result);
-        $this->assertEquals(
-            ['id' => '1', 'name' => 'felizardo', 'password' => '30'],
-            $result
-        );
+        
+        var_dump($result);
 
     }
     
