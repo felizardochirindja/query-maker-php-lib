@@ -43,6 +43,8 @@ class MySQLQueryMakerTest extends TestCase
         $model = $this->getMockBuilder(MainModel::class)
             ->setConstructorArgs(['users'])
             ->getMock();
+
+        // $db = $this->getMockForAbstractClass();
         
         $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_acl', 'root', '');
         $queryMaker = new MySQLQueryMaker($model, $dataBaseConnection);
