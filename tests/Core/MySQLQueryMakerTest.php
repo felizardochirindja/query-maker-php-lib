@@ -1,7 +1,5 @@
 <?php
 
-require '../../vendor/autoload.php';
-
 use PHPUnit\Framework\TestCase;
 use QueryMaker\Core\MySQLQueryMaker;
 use QueryMaker\Model\MainModel;
