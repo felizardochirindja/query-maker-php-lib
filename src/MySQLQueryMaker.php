@@ -1,37 +1,40 @@
 <?php
 
-namespace QueryMaker\Core;
+namespace QueryMaker;
 
 use function count;
 
-use InvalidArgumentException;
+use Exception;
 use PDO;
 use PDOStatement;
-use QueryMaker\Contracts\QueryMaker;
-use QueryMaker\Model\MainModel;
+use QueryMaker\QueryMaker;
 
 final class MySQLQueryMaker implements QueryMaker
 {
     public function __construct(
-        private MainModel $model,
+        private string $tableName,
         private PDO $dataBaseConnection
     ) { }
 
-    public function insert(mixed $useId, mixed ...$data) : bool
-    {
-        if (!is_bool($useId)) {
-            throw new InvalidArgumentException(
-                "userId argument invalid: you must pass true or false"
-            );
-        }
-        
+    public function insert(bool $useId, mixed ...$data) : bool
+    {   
         $columns = $this->getColumns($useId);
 
-        $query = 'INSERT INTO ' . $this->model->tableName . ' (' .
-            $this->appendColumns($columns) .
-            ') VALUES (' . $this->appendBindParams($columns) . ');';
+        if (count($columns) < count($data)) {
+            throw new Exception("provided data array length does not correspond to columns");
+        }
+
+        $query =
+            'INSERT INTO ' . $this->tableName .
+            ' (' . $this->appendColumns($columns) . ')
+            VALUES (' . $this->appendBindParams($columns) . ');'
+        ;
 
         $statment = $this->dataBaseConnection->prepare($query);
+
+        if ($useId) {
+            // colocar o valor default nos dados
+        }
 
         $this->autoBindParam($statment, $columns, $data)->execute();
 
@@ -40,7 +43,7 @@ final class MySQLQueryMaker implements QueryMaker
 
     private function getColumns(bool $useId) : array
     {
-        $query = 'SHOW COLUMNS FROM ' . $this->model->tableName;
+        $query = 'SHOW COLUMNS FROM ' . $this->tableName;
 
         $statment = $this->dataBaseConnection->prepare($query);
         $statment->execute();
@@ -97,32 +100,25 @@ final class MySQLQueryMaker implements QueryMaker
   
     public function select(int $firstRecordPosition, int $recordsPerPage) : array
     {
-        $query = 'SELECT * FROM ' . $this->model->tableName .
+        $query =
+            'SELECT * FROM ' . $this->tableName .
             " LIMIT $firstRecordPosition, $recordsPerPage;";
 
         $statment = $this->dataBaseConnection->prepare($query);
         $statment->execute();
 
-        if ($statment->rowCount() > 0) {
-            return $statment->fetchAll(PDO::FETCH_ASSOC);
-        }
-
-        return [];
+        return $statment->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function selectOne(int $id) : array
+    public function selectOne(int $id) : array | false
     {
-        $query = 'SELECT * FROM ' . $this->model->tableName . ' WHERE id = :id;';
+        $query = 'SELECT * FROM ' . $this->tableName . ' WHERE id = :id;';
 
         $statment = $this->dataBaseConnection->prepare($query);
         $statment->bindParam(':id', $id);
         $statment->execute();
 
-        if ($statment->rowCount() === 1) {
-            return $statment->fetch(PDO::FETCH_ASSOC);
-        }
-
-        return [];
+        return $statment->fetch(PDO::FETCH_ASSOC);
     }
 
     public function update(int $id, mixed ...$data) : bool
@@ -132,12 +128,10 @@ final class MySQLQueryMaker implements QueryMaker
 
     public function delete(int $id) : bool
     {
-        $query = 'DELETE FROM ' . $this->model->tableName . ' WHERE id = :id;';
+        $query = 'DELETE FROM ' . $this->tableName . ' WHERE id = :id;';
 
         $statment = $this->dataBaseConnection->prepare($query);
         $statment->bindParam(':id', $id);
-        $statment->execute();
-
-        return true;
+        return $statment->execute();
     }
 }

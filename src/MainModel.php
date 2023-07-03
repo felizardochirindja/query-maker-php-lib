@@ -1,6 +1,6 @@
 <?php
 
-namespace QueryMaker\Model;
+namespace QueryMaker;
 
 abstract class MainModel
 {

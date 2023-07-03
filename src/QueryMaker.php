@@ -1,12 +1,12 @@
 <?php
 
-namespace QueryMaker\Contracts;
+namespace QueryMaker;
 
 interface QueryMaker
 {
-    function insert(mixed $useId, mixed ...$data) : bool;
+    function insert(bool $useId, mixed ...$data) : bool;
     function select(int $firstRecordPosition, int $recordsPerPage) : array;
-    function selectOne(int $id) : array;
+    function selectOne(int $id) : array | false;
     function update(int $id, mixed ...$data) : bool;
     function delete(int $id) : bool;
 }
