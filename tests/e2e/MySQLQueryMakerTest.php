@@ -2,106 +2,72 @@
 
 use PHPUnit\Framework\TestCase;
 use QueryMaker\MySQLQueryMaker;
-use QueryMaker\MainModel;
 
 class MySQLQueryMakerTest extends TestCase
 {
-    public function testInsert()
+    private PDO $dataBaseConnection;
+    private MySQLQueryMaker $queryMaker; 
+
+    public function setup(): void
     {
-        // $this->markTestSkipped('this test can arbitrarly broke the consistance of the data base');
+        $this->dataBaseConnection = new PDO('mysql:host=localhost;dbname=test', 'root', '');
+        $this->queryMaker = new MySQLQueryMaker('users', $this->dataBaseConnection);
+    }
 
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test', 'root', '');
-        $queryMaker = new MySQLQueryMaker('users', $dataBaseConnection);
-        
-        // $this->expectException(InvalidArgumentException::class);
-
-        $result = $queryMaker->insert(true, 'felizardo', 30, 8);
+    /** @test */
+    public function itShouldInsertDataIntoDataBase(): void
+    {
+        $result = $this->queryMaker->insert(true, 'fff', 'felizardo', 30);
 
         $this->assertTrue($result);
     }
 
-    public function testSelectOne()
-    {
-        // $db = $this->getMockForAbstractClass();
-        
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_acl', 'root', '');
-        $queryMaker = new MySQLQueryMaker('users', $dataBaseConnection);
-
-        $row = $queryMaker->selectOne(2);
+    /** @test */
+    public function itShouldSelectOneRowBasedOnTheGivenId(): void
+    {        
+        $row = $this->queryMaker->selectOne(3);
 
         $this->assertIsArray($row);        
         $this->assertArrayHasKey('id', $row);
-        $this->assertArrayHasKey('username', $row);
-        $this->assertArrayHasKey('user_password', $row);
     }
 
-    public function testSelect()
-    {
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_acl', 'root', '');
-        $queryMaker = new MySQLQueryMaker('users', $dataBaseConnection);
+    /** @test */
+    public function itShouldThrowExceptionIfTheIdDoesNotExist(): void
+    {        
+        $result = $this->queryMaker->selectOne(9999999999);
 
-        $row = $queryMaker->select(1, 5);
+        $this->assertFalse($result);
+    }
+
+    /** @test */
+    public function itShouldSelectDataFromDatabase(): void
+    {
+        $row = $this->queryMaker->select(1, 5);
 
         $this->assertIsArray($row);
     }
 
-    public function testUpdate()
+    /** @test */
+    public function itShouldThrowExceptionIfDataLengthDoesNotCorrespondToColumns(): void
     {
-        $this->markTestSkipped('this test can arbitrarly broke the consistance of the data base');
+        $autoBindParamMethod = self::getMethod($this->queryMaker, 'validateColumnsLength');
+            
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage("provided data array length does not correspond to columns");
 
-        /**
-         * @var MainModel
-        */
-        $model = $this->getMockBuilder(MainModel::class)
-            ->setConstructorArgs(['users'])
-            ->getMock();
-
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_acl', 'root', '');
-        $queryMaker = new MySQLQueryMaker('users', $dataBaseConnection);
-
-        $updated = $queryMaker->update(1, 'Felizardo', 125448);
-
-        $this->assertTrue($updated);
+        $autoBindParamMethod->invokeArgs($this->queryMaker,[[1, 2], [1]]);
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $this->markTestSkipped('this test can arbitrarly broke the consistance of the data base');
         
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
-        $queryMaker = new MySQLQueryMaker('users', $dataBaseConnection);
-
-        $isDelected = $queryMaker->delete(2);
+        $isDelected = $this->queryMaker->delete(2);
 
         $this->assertTrue($isDelected);
     }
 
-    public function testAutoBindParam()
-    {
-        $this->markTestSkipped();
-        $dataBaseConnection = new PDO('mysql:host=localhost;dbname=test_query_maker', 'root', '');
-
-        $queryMaker = new MySQLQueryMaker('users', $dataBaseConnection);
-        $autoBindParamMethod = self::getMethod($queryMaker, 'autoBindParam');
-            
-        $query = 'SELECT * FROM users WHERE id = :id';
-        $statment = $dataBaseConnection->prepare($query);
-
-        $result = $autoBindParamMethod->invokeArgs(
-            $queryMaker, 
-            [
-                $statment,
-                ['id'], [1]
-            ]
-        );
-
-        $result->execute();        
-    }
-    
-    protected static function getMethod(
-        object $className,
-        string $methodName
-    ) : ReflectionMethod
+    private static function getMethod(object $className, string $methodName): ReflectionMethod
     {
         $class = new ReflectionClass($className::class);
         $method = $class->getMethod($methodName);

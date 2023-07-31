@@ -11,18 +11,15 @@ use QueryMaker\QueryMaker;
 
 final class MySQLQueryMaker implements QueryMaker
 {
-    public function __construct(
+    function __construct(
         private string $tableName,
         private PDO $dataBaseConnection
-    ) { }
+    ) {}
 
-    public function insert(bool $useId, mixed ...$data) : bool
+    function insert(bool $useId = false, mixed ...$data): bool
     {   
         $columns = $this->getColumns($useId);
-
-        if (count($columns) < count($data)) {
-            throw new Exception("provided data array length does not correspond to columns");
-        }
+        $this->validateColumnsLength($columns, $data);
 
         $query =
             'INSERT INTO ' . $this->tableName .
@@ -41,7 +38,7 @@ final class MySQLQueryMaker implements QueryMaker
         return true;
     }
 
-    private function getColumns(bool $useId) : array
+    function getColumns(bool $useId): array
     {
         $query = 'SHOW COLUMNS FROM ' . $this->tableName;
 
@@ -59,11 +56,11 @@ final class MySQLQueryMaker implements QueryMaker
         return $columns;
     }
 
-    private function appendColumns(array $columnNames) : string
+    private function appendColumns(array $columnNames): string
     {
         $columns = '';
 
-        for ($i = 0; $i < count($columnNames) - 1; $i++) { 
+        for ($i = 0; $i < count($columnNames) - 1; $i++) {
             $columns .= $columnNames[$i] . ', ';
         }
 
@@ -72,7 +69,7 @@ final class MySQLQueryMaker implements QueryMaker
         return $columns;
     }
 
-    private function appendBindParams(array $columnNames) : string
+    private function appendBindParams(array $columnNames): string
     {
         $columns = '';
 
@@ -89,7 +86,7 @@ final class MySQLQueryMaker implements QueryMaker
         PDOStatement $statment,
         array $columns,
         array $data    
-    ) : PDOStatement
+    ): PDOStatement
     {
         for ($i = 0; $i < count($columns); $i++) {
             $statment->bindParam(":" . $columns[$i], $data[$i]);
@@ -98,7 +95,7 @@ final class MySQLQueryMaker implements QueryMaker
         return $statment;
     }
   
-    public function select(int $firstRecordPosition, int $recordsPerPage) : array
+    function select(int $firstRecordPosition, int $recordsPerPage): array
     {
         $query =
             'SELECT * FROM ' . $this->tableName .
@@ -108,9 +105,9 @@ final class MySQLQueryMaker implements QueryMaker
         $statment->execute();
 
         return $statment->fetchAll(PDO::FETCH_ASSOC);
-    }
+    } 
 
-    public function selectOne(int $id) : array | false
+    function selectOne(int $id): array | false
     {
         $query = 'SELECT * FROM ' . $this->tableName . ' WHERE id = :id;';
 
@@ -121,12 +118,24 @@ final class MySQLQueryMaker implements QueryMaker
         return $statment->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function update(int $id, mixed ...$data) : bool
+    function update(int $id, mixed ...$data): bool
     {
+        $columns = $this->getColumns(false);
+        $this->validateColumnsLength($columns, $data);
+
+        
+
         return true;
     }
 
-    public function delete(int $id) : bool
+    private function validateColumnsLength(array $columns, array $data): void
+    {
+        if (count($columns) !== count($data)) {
+            throw new Exception("provided data array length does not correspond to columns");
+        }
+    }
+
+    function delete(int $id): bool
     {
         $query = 'DELETE FROM ' . $this->tableName . ' WHERE id = :id;';
 
